@@ -17,6 +17,13 @@ async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
 
 export const api = {
   getHealth: () => fetchApi<{ status: string }>("/health"),
+  getStatus: () =>
+    fetchApi<{
+      status: string;
+      cursorConfigured: boolean;
+      openclawConfigured: boolean;
+      githubConfigured: boolean;
+    }>("/status"),
   getProjects: () => fetchApi<{ projects: ProjectSummary[] }>("/projects"),
   getProject: (id: string) => fetchApi<ProjectDetail>("/projects/" + id),
   start: (body: StartRequest) =>

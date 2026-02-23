@@ -68,7 +68,7 @@ export async function handleAgentComplete(
       error: err instanceof Error ? err.message : String(err),
     });
     await sendToOpenClaw({
-      message: `Repo clone hatası: ${err instanceof Error ? err.message : String(err)}. Proje: ${projectId}`,
+      message: `Repo clone error: ${err instanceof Error ? err.message : String(err)}. Project: ${projectId}`,
       name: "Orchestrator",
     });
     return;
@@ -83,7 +83,7 @@ export async function handleAgentComplete(
 
   if (newStatus === "awaiting_approval") {
     await sendToOpenClaw({
-      message: `Uygulama hazır. Onay için POST /approve ile projectId gönderin: ${projectId}`,
+      message: `App ready for approval. Send projectId via POST /approve: ${projectId}`,
       name: "Orchestrator",
     });
     return;
@@ -91,7 +91,7 @@ export async function handleAgentComplete(
 
   if (newStatus === "failed") {
     await sendToOpenClaw({
-      message: `Proje başarısız (max iterasyon aşıldı): ${projectId}`,
+      message: `Project failed (max iterations exceeded): ${projectId}`,
       name: "Orchestrator",
     });
     return;
@@ -126,7 +126,7 @@ export async function handleAgentComplete(
       error: err instanceof Error ? err.message : String(err),
     });
     await sendToOpenClaw({
-      message: `Cursor agent başlatılamadı: ${err instanceof Error ? err.message : String(err)}`,
+      message: `Cursor agent failed to launch: ${err instanceof Error ? err.message : String(err)}`,
       name: "Orchestrator",
     });
   }

@@ -1,13 +1,13 @@
 import { sendToOpenClaw } from "../api/openclaw-api.js";
 
-const PLAN_PROMPT = `Bu uygulama fikrini araştır (Brave Search ile), detaylı planla ve JSON formatında task listesi oluştur.
-Her task için: { "id": "task_1", "title": "Başlık", "description": "Açıklama", "prompt": "Cursor agent'a verilecek talimat" }.
-prompt alanı Expo/React Native geliştirirken kullanılacak, net ve uygulanabilir olmalı.
-Sadece JSON array döndür, başka metin ekleme.`;
+const PLAN_PROMPT = `Research this app idea (with Brave Search), plan in detail, and produce a JSON task list.
+Each task: { "id": "task_1", "title": "Title", "description": "Description", "prompt": "Instruction for Cursor agent" }.
+The prompt field will be used for Expo/React Native development; keep it clear and actionable.
+Return only a JSON array, no other text.`;
 
 export async function requestPlanFromOpenClaw(idea: string): Promise<void> {
   await sendToOpenClaw({
-    message: `${PLAN_PROMPT}\n\nFikir: ${idea}`,
+    message: `${PLAN_PROMPT}\n\nIdea: ${idea}`,
     name: "Orchestrator",
     timeoutSeconds: 180,
   });

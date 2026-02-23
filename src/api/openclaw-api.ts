@@ -16,7 +16,8 @@ export interface OpenClawAgentPayload {
 export async function sendToOpenClaw(payload: OpenClawAgentPayload): Promise<void> {
   const env = getEnv();
   if (!env.OPENCLAW_HOOKS_TOKEN) {
-    throw new Error("OPENCLAW_HOOKS_TOKEN is required for OpenClaw API");
+    logger.info("OpenClaw: skipping (no OPENCLAW_HOOKS_TOKEN)");
+    return;
   }
   const url = `${env.OPENCLAW_GATEWAY_URL.replace(/^ws/, "http")}/hooks/agent`;
 

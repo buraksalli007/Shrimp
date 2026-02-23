@@ -1,3 +1,7 @@
+/**
+ * OpenAI API via native fetch only. Do NOT use the "openai" npm package -
+ * it causes "no construct signatures" errors on Vercel/TypeScript.
+ */
 import { getEnv } from "../config/env.js";
 import { logger } from "../utils/logger.js";
 
@@ -12,29 +16,41 @@ export async function generateFixPromptWithLLM(
   }
 
   try {
-    const { default: OpenAI } = await import("openai");
-    const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+    const systemPrompt = `You are a senior React Native / Expo developer. Task: Produce a short, clear prompt for the Cursor agent to fix the given errors. Write only the fix instruction, no other explanation.`;
 
-    const systemPrompt = `Sen bir senior React Native / Expo geliştiricisisin. Görev: Verilen hataları düzeltmek için Cursor agent'a verilecek kısa, net bir prompt üret. Sadece düzeltme talimatı yaz, başka açıklama ekleme.`;
+    const userPrompt = `Task context: ${taskContext}
 
-    const userPrompt = `Görev bağlamı: ${taskContext}
-
-Tespit edilen hatalar:
+Detected errors:
 ${errors.join("\n")}
-${codebaseContext ? `\nİlgili kod/çıktı:\n${codebaseContext}` : ""}
+${codebaseContext ? `\nRelevant code/output:\n${codebaseContext}` : ""}
 
-Bu hataları düzeltecek Cursor agent prompt'unu yaz (Türkçe veya İngilizce, maksimum 300 kelime):`;
+Write the Cursor agent prompt to fix these errors (max 300 words):`;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      max_tokens: 500,
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        max_tokens: 500,
+      }),
     });
 
-    const content = response.choices[0]?.message?.content?.trim();
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`OpenAI API ${res.status}: ${text}`);
+    }
+
+    const data = (await res.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
+    const content = data.choices?.[0]?.message?.content?.trim();
     if (content) {
       logger.info("LLM generated fix prompt", { length: content.length });
       return content;

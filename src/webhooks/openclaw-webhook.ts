@@ -69,7 +69,7 @@ export function registerOpenClawWebhook(app: import("express").Express): void {
         await executeAppStoreUpload(projectId);
         markCompleted(projectId);
         await sendToOpenClaw({
-          message: `Proje ${projectId} App Store'a yüklendi.`,
+          message: `Project ${projectId} uploaded to App Store.`,
           name: "Orchestrator",
         });
         logger.info("App Store upload completed via OpenClaw webhook", { projectId });
@@ -79,7 +79,7 @@ export function registerOpenClawWebhook(app: import("express").Express): void {
           error: err instanceof Error ? err.message : String(err),
         });
         await sendToOpenClaw({
-          message: `App Store yükleme hatası (${projectId}): ${err instanceof Error ? err.message : String(err)}`,
+          message: `App Store upload failed (${projectId}): ${err instanceof Error ? err.message : String(err)}`,
           name: "Orchestrator",
         });
       }

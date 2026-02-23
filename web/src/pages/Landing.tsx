@@ -16,67 +16,71 @@ export function Landing() {
       </nav>
 
       <header className="hero">
-        <div className="hero-badge">API · OpenClaw Tool</div>
+        <div className="hero-badge">Cursor + OpenClaw · API · Tool</div>
         <h1 className="hero-title">
-          The bridge between <span className="gradient">Cursor</span> and <span className="gradient">OpenClaw</span>
+          <span className="gradient">Cursor</span> that works with <span className="gradient">OpenClaw</span>
         </h1>
         <p className="hero-subtitle">
-          Orchestrate AI agents to build production apps from idea to App Store. 
-          One API key. Automated verification. Error-fix loops. Full control.
+          Shrimp Bridge connects Cursor Cloud Agents and OpenClaw so they work together. 
+          OpenClaw researches and plans. Cursor builds. Automated verification and error-fix loops 
+          take your app from idea to App Store.
         </p>
         <div className="hero-actions">
-          <Link to="/dashboard" className="btn btn-primary">Get API Key</Link>
+          <Link to="/dashboard" className="btn btn-primary">Open Dashboard</Link>
           <a href="#how-it-works" className="btn btn-ghost">How it works</a>
         </div>
       </header>
 
       <section id="features" className="section features">
-        <h2 className="section-title">Built for professional workflows</h2>
+        <h2 className="section-title">Why Cursor + OpenClaw together</h2>
+        <p className="section-intro">
+          Cursor excels at code. OpenClaw excels at research and planning. Shrimp Bridge orchestrates both.
+        </p>
         <div className="feature-grid">
           <div className="feature-card">
             <div className="feature-icon">⟡</div>
-            <h3>Cursor Integration</h3>
-            <p>Launch Cloud Agents via API. Webhook-triggered verification on every completion.</p>
+            <h3>Cursor builds</h3>
+            <p>Launch Cursor Cloud Agents via API. Each completion triggers verification. Webhooks keep everything in sync.</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">◇</div>
-            <h3>OpenClaw Tool</h3>
-            <p>Native OpenClaw integration. Research, plan, and orchestrate from your assistant.</p>
+            <h3>OpenClaw plans</h3>
+            <p>OpenClaw researches your idea, creates task lists, and notifies you when the app is ready for approval.</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">◈</div>
-            <h3>Error-Fix Loop</h3>
-            <p>Automatic verification, fix-prompt generation, and retry until the app is production-ready.</p>
+            <h3>Error-fix loop</h3>
+            <p>Verification fails? We generate fix prompts and retry with Cursor until the app passes.</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">◆</div>
-            <h3>App Store Ready</h3>
-            <p>EAS build and submit. One approval flow from your dashboard to the store.</p>
+            <h3>App Store deploy</h3>
+            <p>Approve from dashboard or OpenClaw. EAS builds and submits to the App Store.</p>
           </div>
         </div>
       </section>
 
       <section id="how-it-works" className="section how">
-        <h2 className="section-title">How it works</h2>
+        <h2 className="section-title">How Cursor and OpenClaw work together</h2>
         <div className="flow">
           <div className="flow-step">
             <span className="flow-num">1</span>
-            <p>Submit your idea via API or dashboard</p>
+            <p>You submit an app idea (API or dashboard)</p>
           </div>
           <div className="flow-arrow">→</div>
           <div className="flow-step">
             <span className="flow-num">2</span>
-            <p>OpenClaw researches and plans. Cursor builds.</p>
+            <p>OpenClaw researches and plans tasks. Cursor implements each task.</p>
           </div>
           <div className="flow-arrow">→</div>
           <div className="flow-step">
             <span className="flow-num">3</span>
-            <p>Each completion triggers verification. Errors → fix prompts → retry.</p>
+            <p>On each Cursor completion: verify → if errors, generate fix prompt → retry.</p>
           </div>
           <div className="flow-arrow">→</div>
           <div className="flow-step">
             <span className="flow-num">4</span>
-            <p>Approve. EAS uploads to App Store.</p>
+            <p>App ready. Approve from dashboard or OpenClaw. EAS uploads to App Store.</p>
           </div>
         </div>
       </section>
@@ -122,8 +126,12 @@ export function Landing() {
       <section id="docs" className="section docs">
         <h2 className="section-title">API reference</h2>
         <div className="docs-block">
-          <p className="docs-intro">Authenticate with <code>Authorization: Bearer YOUR_API_KEY</code>. Base URL: <code>https://api.shrimpbridge.io</code></p>
+          <p className="docs-intro">Use <code>Authorization: Bearer YOUR_API_KEY</code> when API keys are enabled. Base URL is your deployment URL (e.g. <code>https://your-domain.com</code>).</p>
           <div className="docs-endpoints">
+            <div className="docs-endpoint">
+              <code>GET /status</code>
+              <p>Check service status and configuration (cursorConfigured, openclawConfigured, githubConfigured).</p>
+            </div>
             <div className="docs-endpoint">
               <code>POST /start</code>
               <p>Start a new project. Body: idea, githubRepo, branch?, tasks?</p>

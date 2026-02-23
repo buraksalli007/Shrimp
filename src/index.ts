@@ -38,6 +38,16 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "openclaw-cursor-orchestrator", version: "1.0.0" });
 });
 
+app.get("/status", (_req, res) => {
+  const env = getEnv();
+  res.json({
+    status: "ok",
+    cursorConfigured: !!env.CURSOR_API_KEY,
+    openclawConfigured: !!env.OPENCLAW_HOOKS_TOKEN,
+    githubConfigured: !!env.GITHUB_TOKEN,
+  });
+});
+
 app.get("/projects", (_req, res) => {
   const projects = getAllProjects();
   res.json({ projects });
@@ -167,7 +177,7 @@ app.post("/approve", async (req, res) => {
     markCompleted(projectId);
 
     await sendToOpenClaw({
-      message: `Proje ${projectId} App Store'a yüklendi.`,
+      message: `Project ${projectId} uploaded to App Store.`,
       name: "Orchestrator",
     });
 
@@ -194,7 +204,7 @@ if (existsSync(webDistPath)) {
   app.use(express.static(webDistPath, { index: false }));
   app.get("*", (req, res, next) => {
     const p = req.path;
-    const isApi = p === "/health" || p === "/projects" || p === "/start" || p === "/approve" ||
+    const isApi = p === "/health" || p === "/status" || p === "/projects" || p === "/start" || p === "/approve" ||
       p.startsWith("/projects/") || p.startsWith("/webhooks/");
     if (!isApi) {
       res.sendFile(path.join(webDistPath, "index.html"), (err) => {
