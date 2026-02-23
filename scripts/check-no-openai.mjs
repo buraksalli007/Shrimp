@@ -16,13 +16,10 @@ if (pkg.dependencies?.openai || pkg.devDependencies?.openai) {
   process.exit(1);
 }
 
-const apiFile = readFileSync(join(root, "src/api/openai-api.ts"), "utf8");
-const bad = ["new OpenAI", 'from "openai"', "from 'openai'"];
-for (const b of bad) {
-  if (apiFile.includes(b)) {
-    console.error(`ERROR: openai-api.ts must use fetch, not OpenAI SDK. Found: ${b}`);
-    process.exit(1);
-  }
+const promptGen = readFileSync(join(root, "src/services/prompt-generator.ts"), "utf8");
+if (promptGen.includes("new OpenAI") || /from\s+["']openai["']/.test(promptGen)) {
+  console.error("ERROR: Must use fetch, not OpenAI SDK.");
+  process.exit(1);
 }
 
 console.log("OK: No openai SDK usage");
