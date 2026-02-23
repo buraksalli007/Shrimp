@@ -103,6 +103,23 @@ export async function handleAgentComplete(
   if (verificationResult.success && nextTask) {
     prompt = nextTask.prompt;
   } else {
+    const env = getEnv();
+    if (env.OPENCLAW_HOOKS_TOKEN) {
+      const { setPendingFix } = await import("../services/task-manager.js");
+      const { requestFixFromOpenClaw } = await import("../webhooks/openclaw-bridge.js");
+      setPendingFix(projectId);
+      await requestFixFromOpenClaw(
+        projectId,
+        verificationResult.errors,
+        task.prompt,
+        verificationResult.stderr
+      );
+      await sendToOpenClaw({
+        message: `Verification failed for ${projectId}. OpenClaw: research a fix and reply via webhook with { "projectId": "${projectId}", "type": "fix", "fixPrompt": "..." }`,
+        name: "Orchestrator",
+      });
+      return;
+    }
     prompt = await generateFixPrompt(
       verificationResult.errors,
       task.prompt,

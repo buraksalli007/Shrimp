@@ -2,6 +2,10 @@ import "dotenv/config";
 import { z } from "zod";
 
 const envSchema = z.object({
+  DATABASE_URL: z.string().optional(),
+  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  API_KEYS: z.string().optional(),
+  CORS_ORIGIN: z.string().optional(),
   CURSOR_API_KEY: z.string().optional(),
   CURSOR_WEBHOOK_SECRET: z.string().optional(),
   OPENCLAW_GATEWAY_URL: z.string().default("http://127.0.0.1:18789"),
@@ -12,6 +16,10 @@ const envSchema = z.object({
   GITHUB_REPO_NAME: z.string().optional(),
   GITHUB_TOKEN: z.string().optional(),
   OPENAI_API_KEY: z.string().optional(),
+  STRIPE_SECRET_KEY: z.string().optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  STRIPE_STARTER_PRICE_ID: z.string().optional(),
+  STRIPE_PRO_PRICE_ID: z.string().optional(),
   MAX_ITERATIONS: z.coerce.number().default(10),
   VERIFICATION_TIMEOUT_MS: z.coerce.number().default(120_000),
   PORT: z.coerce.number().default(3000),

@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  passwordHash     String?
+  stripeCustomerId String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  apiKeys          ApiKey[]
+  projects         Project[]
+}
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  keyHash   String   @unique
+  name      String   @default("default")
+  tier      String   @default("starter")
+  createdAt DateTime @default(now())
+  projects  Project[]
+}
+
+model Project {
+  id              String   @id @default(cuid())
+  projectId       String   @unique
+  userId          String?
+  apiKeyId        String?
+  idea            String
+  githubRepo      String
+  branch          String   @default("main")
+  status          String   @default("running")
+  tasksJson       String
+  currentIndex    Int      @default(0)
+  iteration       Int      @default(0)
+  maxIterations   Int      @default(10)
+  currentAgentId  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User?    @relation(fields: [userId], references: [id])
+  apiKey          ApiKey?  @relation(fields: [apiKeyId], references: [id])
+}

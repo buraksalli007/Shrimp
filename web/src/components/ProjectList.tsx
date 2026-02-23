@@ -8,6 +8,8 @@ interface Props {
 
 function statusLabel(status: string) {
   const map: Record<string, string> = {
+    pending_plan: "Awaiting OpenClaw plan",
+    pending_fix: "Awaiting OpenClaw fix",
     running: "Running",
     awaiting_approval: "Awaiting approval",
     completed: "Completed",
@@ -18,6 +20,8 @@ function statusLabel(status: string) {
 
 function statusClass(status: string) {
   const map: Record<string, string> = {
+    pending_plan: "status-awaiting",
+    pending_fix: "status-awaiting",
     running: "status-running",
     awaiting_approval: "status-awaiting",
     completed: "status-completed",

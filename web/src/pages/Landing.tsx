@@ -108,7 +108,7 @@ export function Landing() {
               <li>Priority support</li>
               <li>OpenClaw tool access</li>
             </ul>
-            <Link to="/dashboard" className="btn btn-primary">Get Pro</Link>
+            <a href="https://www.shrimpbridge.com/dashboard" className="btn btn-primary">Get Pro</a>
           </div>
           <div className="pricing-card">
             <h3>Enterprise</h3>
@@ -163,6 +163,7 @@ export function Landing() {
           <span>Shrimp Bridge</span>
           <a href="https://www.shrimpbridge.com">shrimpbridge.com</a>
           <a href="https://github.com/buraksalli007/Shrimp">GitHub</a>
+          <a href="https://github.com/buraksalli007/Shrimp/blob/main/docs/SETUP.md">Setup</a>
         </div>
       </footer>
     </div>

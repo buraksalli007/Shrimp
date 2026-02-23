@@ -1,4 +1,4 @@
-import {
+import type {
   Task,
   TaskState,
   TaskStatus,
@@ -18,6 +18,7 @@ export function createProject(params: {
   branch?: string;
   tasks: Task[];
   maxIterations?: number;
+  status?: TaskStatus;
 }): TaskState {
   const projectId = generateProjectId();
   const now = new Date();
@@ -30,7 +31,7 @@ export function createProject(params: {
     currentIndex: 0,
     iteration: 0,
     maxIterations: params.maxIterations ?? DEFAULT_MAX_ITERATIONS,
-    status: "running",
+    status: params.status ?? "running",
     createdAt: now,
     updatedAt: now,
   };
@@ -125,6 +126,31 @@ export function markCompleted(projectId: string): void {
   const state = projectStates.get(projectId);
   if (state) {
     state.status = "completed";
+    state.updatedAt = new Date();
+  }
+}
+
+export function updateProjectWithTasks(projectId: string, tasks: Task[]): boolean {
+  const state = projectStates.get(projectId);
+  if (!state || state.status !== "pending_plan") return false;
+  state.tasks = tasks;
+  state.status = "running";
+  state.updatedAt = new Date();
+  return true;
+}
+
+export function setPendingFix(projectId: string): void {
+  const state = projectStates.get(projectId);
+  if (state) {
+    state.status = "pending_fix";
+    state.updatedAt = new Date();
+  }
+}
+
+export function setProjectRunning(projectId: string): void {
+  const state = projectStates.get(projectId);
+  if (state) {
+    state.status = "running";
     state.updatedAt = new Date();
   }
 }

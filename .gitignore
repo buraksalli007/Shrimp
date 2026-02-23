@@ -8,3 +8,7 @@ web/dist/
 *.local
 .env.local
 .env.*.local
+prisma/dev.db
+prisma/dev.db-journal
+
+src/generated/

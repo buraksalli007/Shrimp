@@ -1,12 +1,32 @@
 const API_BASE = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? "/api" : "");
+const API_KEY_STORAGE = "shrimp_api_key";
+
+export function getStoredApiKey(): string | null {
+  try {
+    return localStorage.getItem(API_KEY_STORAGE);
+  } catch {
+    return null;
+  }
+}
+
+export function setStoredApiKey(key: string | null): void {
+  try {
+    if (key) localStorage.setItem(API_KEY_STORAGE, key);
+    else localStorage.removeItem(API_KEY_STORAGE);
+  } catch {}
+}
 
 async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
+  const apiKey = getStoredApiKey();
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(options?.headers as Record<string, string>),
+  };
+  if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`;
+
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
+    headers,
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {

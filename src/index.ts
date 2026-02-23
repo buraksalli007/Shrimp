@@ -13,15 +13,20 @@ import { sendToOpenClaw } from "./api/openclaw-api.js";
 import { requestPlanFromOpenClaw } from "./webhooks/openclaw-bridge.js";
 import { executeAppStoreUpload } from "./services/eas-controller.js";
 import { startRequestSchema, approveRequestSchema } from "./validation/schemas.js";
+import { requireApiKey } from "./middleware/auth.js";
+import { securityMiddleware } from "./middleware/security.js";
 import type { Task } from "./types/index.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
+const { limiter, helmet } = securityMiddleware();
 
+app.use(helmet);
 app.use((_req, res, next) => {
+  const origin = getEnv().CORS_ORIGIN || "*";
   res.setHeader("X-Content-Type-Options", "nosniff");
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Origin", origin);
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   if (_req.method === "OPTIONS") {
@@ -32,6 +37,7 @@ app.use((_req, res, next) => {
 });
 
 app.use(express.json({ limit: "1mb" }));
+app.use(limiter);
 
 
 app.get("/health", (_req, res) => {
@@ -40,20 +46,23 @@ app.get("/health", (_req, res) => {
 
 app.get("/status", (_req, res) => {
   const env = getEnv();
+  const apiKeys = env.API_KEYS?.split(",").map((k) => k.trim()).filter(Boolean) ?? [];
   res.json({
     status: "ok",
     cursorConfigured: !!env.CURSOR_API_KEY,
     openclawConfigured: !!env.OPENCLAW_HOOKS_TOKEN,
     githubConfigured: !!env.GITHUB_TOKEN,
+    apiKeysRequired: apiKeys.length > 0,
+    stripeConfigured: !!env.STRIPE_SECRET_KEY,
   });
 });
 
-app.get("/projects", (_req, res) => {
+app.get("/projects", requireApiKey, (_req, res) => {
   const projects = getAllProjects();
   res.json({ projects });
 });
 
-app.get("/projects/:projectId", (req, res) => {
+app.get("/projects/:projectId", requireApiKey, (req, res) => {
   const state = getProject(req.params.projectId);
   if (!state) {
     res.status(404).json({ error: "Project not found" });
@@ -75,7 +84,7 @@ app.get("/projects/:projectId", (req, res) => {
   });
 });
 
-app.post("/start", async (req, res) => {
+app.post("/start", requireApiKey, async (req, res) => {
   try {
     const parseResult = startRequestSchema.safeParse(req.body);
     if (!parseResult.success) {
@@ -85,8 +94,10 @@ app.post("/start", async (req, res) => {
     }
     const { idea, githubRepo, branch = "main", tasks: providedTasks } = parseResult.data;
 
-    let tasks: Task[];
     const filtered = providedTasks?.filter((t) => t.prompt || t.title) ?? [];
+    let tasks: Task[];
+    let useOpenClawPlan = false;
+
     if (filtered.length > 0) {
       tasks = filtered.map((t) => ({
         id: t.id ?? `task_${Math.random().toString(36).slice(2, 9)}`,
@@ -95,7 +106,6 @@ app.post("/start", async (req, res) => {
         prompt: t.prompt ?? t.title ?? idea,
       }));
     } else {
-      await requestPlanFromOpenClaw(idea);
       tasks = [
         {
           id: "task_1",
@@ -104,6 +114,7 @@ app.post("/start", async (req, res) => {
           prompt: `Create a complete Expo/React Native app for: ${idea}. Use the Vibecode template structure. Follow Apple HIG for design.`,
         },
       ];
+      useOpenClawPlan = !!getEnv().OPENCLAW_HOOKS_TOKEN;
     }
 
     const state = createProject({
@@ -111,7 +122,21 @@ app.post("/start", async (req, res) => {
       githubRepo,
       branch,
       tasks,
+      status: useOpenClawPlan ? "pending_plan" : "running",
     });
+
+    if (useOpenClawPlan) {
+      await requestPlanFromOpenClaw(idea, state.projectId);
+      logger.info("Project created, awaiting OpenClaw plan", {
+        projectId: state.projectId,
+      });
+      res.status(202).json({
+        projectId: state.projectId,
+        status: "pending_plan",
+        message: "OpenClaw will research and send plan. Reply via POST /webhooks/openclaw with { projectId, type: 'plan', tasks: [...] }",
+      });
+      return;
+    }
 
     const firstTask = getNextTask(state.projectId);
     if (!firstTask) {
@@ -150,7 +175,7 @@ app.post("/start", async (req, res) => {
   }
 });
 
-app.post("/approve", async (req, res) => {
+app.post("/approve", requireApiKey, async (req, res) => {
   try {
     const parseResult = approveRequestSchema.safeParse(req.body);
     if (!parseResult.success) {
@@ -196,16 +221,24 @@ app.post("/approve", async (req, res) => {
   }
 });
 
+app.post("/checkout", async (req, res) => {
+  const { createCheckoutSession } = await import("./routes/checkout.js");
+  await createCheckoutSession(req, res);
+});
+
 registerCursorWebhook(app);
 registerOpenClawWebhook(app);
+const { registerStripeWebhook } = await import("./webhooks/stripe-webhook.js");
+registerStripeWebhook(app);
 
 const webDistPath = path.join(__dirname, "..", "web", "dist");
 if (existsSync(webDistPath)) {
   app.use(express.static(webDistPath, { index: false }));
   app.get("*", (req, res, next) => {
     const p = req.path;
-    const isApi = p === "/health" || p === "/status" || p === "/projects" || p === "/start" || p === "/approve" ||
-      p.startsWith("/projects/") || p.startsWith("/webhooks/");
+    const isApi =
+      p === "/health" || p === "/status" || p === "/projects" || p === "/start" || p === "/approve" ||
+      p === "/checkout" || p.startsWith("/projects/") || p.startsWith("/webhooks/");
     if (!isApi) {
       res.sendFile(path.join(webDistPath, "index.html"), (err) => {
         if (err) next(err);

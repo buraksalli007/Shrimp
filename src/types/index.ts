@@ -12,7 +12,7 @@ export interface VerificationResult {
   stderr?: string;
 }
 
-export type TaskStatus = "running" | "awaiting_approval" | "completed" | "failed";
+export type TaskStatus = "pending_plan" | "running" | "awaiting_approval" | "completed" | "failed" | "pending_fix";
 
 export interface TaskState {
   projectId: string;

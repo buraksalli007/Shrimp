@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { api, type ProjectSummary } from "../api";
+import { api, type ProjectSummary, getStoredApiKey, setStoredApiKey } from "../api";
 import { StartForm } from "../components/StartForm";
 import { ProjectList } from "../components/ProjectList";
 import { ProjectDetail } from "../components/ProjectDetail";
@@ -18,6 +18,12 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<ServiceStatus | null>(null);
+  const [apiKey, setApiKey] = useState(getStoredApiKey() ?? "");
+  const [authError, setAuthError] = useState(false);
+
+  useEffect(() => {
+    setApiKey(getStoredApiKey() ?? "");
+  }, []);
 
   useEffect(() => {
     loadStatus();
@@ -53,11 +59,20 @@ export function Dashboard() {
       const data = await api.getProjects();
       setProjects(data.projects);
       setError(null);
+      setAuthError(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Connection error");
+      const msg = err instanceof Error ? err.message : "Connection error";
+      setError(msg);
+      setAuthError(msg.includes("API key") || msg.includes("401") || msg.includes("403"));
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleApiKeySave() {
+    setStoredApiKey(apiKey.trim() || null);
+    loadProjects();
+    loadStatus();
   }
 
   return (
@@ -73,6 +88,25 @@ export function Dashboard() {
       </nav>
 
       <main className="dashboard-main">
+        <section className="section api-key-section">
+          <h2>API key</h2>
+          <div className="form form-inline">
+            <input
+              type="password"
+              placeholder="Your API key (optional in demo mode)"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              className="api-key-input"
+            />
+            <button type="button" className="btn btn-primary" onClick={handleApiKeySave}>
+              Save
+            </button>
+          </div>
+          {(authError || error?.includes("API key")) && (
+            <p className="form-error">Valid API key required. Add API_KEYS to server .env or get one from your plan.</p>
+          )}
+        </section>
+
         {status && (
           <section className="section status-section">
             <div className={`status-banner ${status.connected ? "connected" : "disconnected"}`}>
