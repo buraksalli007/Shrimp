@@ -1,0 +1,11 @@
+# OpenClaw-Cursor Orchestrator - Proje Kuralları
+
+## Git Sync (ZORUNLU)
+
+Her kod değişikliğinden sonra mutlaka:
+1. GitHub'a push et: `git add -A && git commit -m "..." && git push`
+2. Masaüstü SHRIMP klasörü zaten kaynak - değişiklikler orada yapılıyor
+
+Bu iki yer her zaman senkron tutulmalı:
+- GitHub: https://github.com/buraksalli007/Shrimp
+- Local: /Users/buraksalli/Desktop/SHRIMP/openclaw-cursor-orchestrator
