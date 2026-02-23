@@ -3,6 +3,7 @@
 ## Production
 - **Site:** https://www.shrimpbridge.com
 - **Domain:** shrimpbridge.com (307 → www), www.shrimpbridge.com (Production)
+- **Setup:** docs/SETUP.md | docs/API_KEYS_NEEDED.md
 
 ## Git Sync (ZORUNLU)
 
