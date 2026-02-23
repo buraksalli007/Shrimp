@@ -1,4 +1,4 @@
-import type { ProjectSummary } from "../App";
+import type { ProjectSummary } from "../api";
 
 interface Props {
   projects: ProjectSummary[];
@@ -8,10 +8,10 @@ interface Props {
 
 function statusLabel(status: string) {
   const map: Record<string, string> = {
-    running: "Çalışıyor",
-    awaiting_approval: "Onay Bekliyor",
-    completed: "Tamamlandı",
-    failed: "Başarısız",
+    running: "Running",
+    awaiting_approval: "Awaiting approval",
+    completed: "Completed",
+    failed: "Failed",
   };
   return map[status] ?? status;
 }
@@ -29,7 +29,7 @@ function statusClass(status: string) {
 export function ProjectList({ projects, selectedId, onSelect }: Props) {
   if (projects.length === 0) {
     return (
-      <p className="empty">Henüz proje yok. Yeni proje başlatın.</p>
+      <p className="empty">No projects yet. Start a new project above.</p>
     );
   }
 
@@ -49,7 +49,7 @@ export function ProjectList({ projects, selectedId, onSelect }: Props) {
           </div>
           <p className="project-idea">{p.idea}</p>
           <p className="project-date">
-            {new Date(p.createdAt).toLocaleString("tr-TR")}
+            {new Date(p.createdAt).toLocaleString("en-US")}
           </p>
         </div>
       ))}

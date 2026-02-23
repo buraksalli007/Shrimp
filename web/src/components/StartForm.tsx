@@ -22,7 +22,7 @@ export function StartForm({ onSuccess }: FormProps) {
       setGithubRepo("");
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Hata oluştu");
+      setError(err instanceof Error ? err.message : "Request failed");
     } finally {
       setLoading(false);
     }
@@ -31,19 +31,19 @@ export function StartForm({ onSuccess }: FormProps) {
   return (
     <form className="form" onSubmit={handleSubmit}>
       <div className="form-group">
-        <label htmlFor="idea">Uygulama Fikri</label>
+        <label htmlFor="idea">App idea</label>
         <textarea
           id="idea"
           value={idea}
           onChange={(e) => setIdea(e.target.value)}
-          placeholder="Örn: Fitness takip uygulaması, günlük hedefler, kalori sayacı..."
+          placeholder="e.g. Fitness tracker with daily goals and calorie counter..."
           rows={3}
           required
         />
       </div>
       <div className="form-row">
         <div className="form-group">
-          <label htmlFor="repo">GitHub Repo</label>
+          <label htmlFor="repo">GitHub repo</label>
           <input
             id="repo"
             type="text"
@@ -66,7 +66,7 @@ export function StartForm({ onSuccess }: FormProps) {
       </div>
       {error && <p className="form-error">{error}</p>}
       <button type="submit" className="btn btn-primary" disabled={loading}>
-        {loading ? "Başlatılıyor..." : "Proje Başlat"}
+        {loading ? "Starting..." : "Start project"}
       </button>
     </form>
   );

@@ -1,22 +1,32 @@
 :root {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #334155;
-  --accent: #38bdf8;
-  --accent-hover: #7dd3fc;
-  --success: #22c55e;
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-tertiary: #1a1a24;
+  --bg-elevated: #22222e;
+  --accent: #00d4aa;
+  --accent-dim: rgba(0, 212, 170, 0.15);
+  --accent-hover: #00f5c4;
+  --success: #00d4aa;
   --warning: #f59e0b;
   --error: #ef4444;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --border: #334155;
-  --radius: 12px;
-  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --border: #27272a;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --transition: 0.2s ease;
 }
 
 * {
   box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -26,6 +36,7 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
@@ -39,4 +50,13 @@ button {
 
 input, textarea {
   font-family: inherit;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent-hover);
 }

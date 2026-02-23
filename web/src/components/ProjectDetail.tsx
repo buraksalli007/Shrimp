@@ -20,7 +20,7 @@ export function ProjectDetail({ projectId, onClose, onApprove }: Props) {
         const data = await api.getProject(projectId);
         if (!cancelled) setProject(data);
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : "Hata");
+        if (!cancelled) setError(err instanceof Error ? err.message : "Error");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -39,46 +39,46 @@ export function ProjectDetail({ projectId, onClose, onApprove }: Props) {
       await api.approve(projectId);
       onApprove();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Onay hatası");
+        setError(err instanceof Error ? err.message : "Approval failed");
     } finally {
       setApproving(false);
     }
   }
 
-  if (loading) return <p className="loading">Yükleniyor...</p>;
-  if (error || !project) return <p className="error">{error ?? "Proje bulunamadı"}</p>;
+  if (loading) return <p className="loading">Loading...</p>;
+  if (error || !project) return <p className="error">{error ?? "Project not found"}</p>;
 
   const canApprove = project.status === "awaiting_approval";
 
   return (
     <div className="detail">
       <div className="detail-header">
-        <h3>Proje Detayı</h3>
+        <h3>Project detail</h3>
         <button type="button" className="btn btn-ghost" onClick={onClose}>
-          Kapat
+          Close
         </button>
       </div>
       <dl className="detail-grid">
-        <dt>Proje ID</dt>
+        <dt>Project ID</dt>
         <dd><code>{project.projectId}</code></dd>
-        <dt>Fikir</dt>
+        <dt>Idea</dt>
         <dd>{project.idea}</dd>
-        <dt>GitHub Repo</dt>
+        <dt>GitHub repo</dt>
         <dd><code>{project.githubRepo}</code></dd>
         <dt>Branch</dt>
         <dd>{project.branch}</dd>
-        <dt>Durum</dt>
+        <dt>Status</dt>
         <dd><span className={`status-badge status-${project.status}`}>{project.status}</span></dd>
         <dt>Task</dt>
         <dd>{project.currentTaskIndex + 1} / {project.totalTasks}</dd>
-        <dt>İterasyon</dt>
+        <dt>Iteration</dt>
         <dd>{project.iteration} / {project.maxIterations}</dd>
         <dt>Agent ID</dt>
         <dd><code>{project.currentAgentId ?? "-"}</code></dd>
-        <dt>Oluşturulma</dt>
-        <dd>{new Date(project.createdAt).toLocaleString("tr-TR")}</dd>
-        <dt>Güncelleme</dt>
-        <dd>{new Date(project.updatedAt).toLocaleString("tr-TR")}</dd>
+        <dt>Created</dt>
+        <dd>{new Date(project.createdAt).toLocaleString("en-US")}</dd>
+        <dt>Updated</dt>
+        <dd>{new Date(project.updatedAt).toLocaleString("en-US")}</dd>
       </dl>
       {canApprove && (
         <div className="detail-actions">
@@ -88,7 +88,7 @@ export function ProjectDetail({ projectId, onClose, onApprove }: Props) {
             onClick={handleApprove}
             disabled={approving}
           >
-            {approving ? "Yükleniyor..." : "Onayla ve App Store'a Yükle"}
+            {approving ? "Submitting..." : "Approve & submit to App Store"}
           </button>
         </div>
       )}
