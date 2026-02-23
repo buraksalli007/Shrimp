@@ -118,7 +118,7 @@ export function Landing() {
               <li>Dedicated infra</li>
               <li>SLA & onboarding</li>
             </ul>
-            <a href="mailto:sales@shrimpbridge.io" className="btn btn-outline">Contact</a>
+            <a href="mailto:sales@shrimpbridge.com" className="btn btn-outline">Contact</a>
           </div>
         </div>
       </section>
@@ -126,7 +126,7 @@ export function Landing() {
       <section id="docs" className="section docs">
         <h2 className="section-title">API reference</h2>
         <div className="docs-block">
-          <p className="docs-intro">Use <code>Authorization: Bearer YOUR_API_KEY</code> when API keys are enabled. Base URL is your deployment URL (e.g. <code>https://your-domain.com</code>).</p>
+          <p className="docs-intro">Use <code>Authorization: Bearer YOUR_API_KEY</code> when API keys are enabled. Base URL: <code>https://www.shrimpbridge.com</code></p>
           <div className="docs-endpoints">
             <div className="docs-endpoint">
               <code>GET /status</code>
@@ -161,6 +161,7 @@ export function Landing() {
       <footer className="footer">
         <div className="footer-inner">
           <span>Shrimp Bridge</span>
+          <a href="https://www.shrimpbridge.com">shrimpbridge.com</a>
           <a href="https://github.com/buraksalli007/Shrimp">GitHub</a>
         </div>
       </footer>

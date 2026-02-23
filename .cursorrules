@@ -1,5 +1,9 @@
 # OpenClaw-Cursor Orchestrator - Proje Kuralları
 
+## Production
+- **Site:** https://www.shrimpbridge.com
+- **Domain:** shrimpbridge.com (307 → www), www.shrimpbridge.com (Production)
+
 ## Git Sync (ZORUNLU)
 
 Her kod değişikliğinden sonra mutlaka:
