@@ -4,13 +4,16 @@
 - **Site:** https://www.shrimpbridge.com
 - **Domain:** shrimpbridge.com (307 → www), www.shrimpbridge.com (Production)
 - **Setup:** docs/SETUP.md | docs/API_KEYS_NEEDED.md
+- **Detaylı özet:** docs/PROJECT_OVERVIEW.md
+- **Sync rehberi:** docs/PROJECT_SYNC.md
 
 ## Git Sync (ZORUNLU)
 
 Her kod değişikliğinden sonra mutlaka:
-1. GitHub'a push et: `git add -A && git commit -m "..." && git push`
-2. Masaüstü SHRIMP klasörü zaten kaynak - değişiklikler orada yapılıyor
+1. GitHub'a push et: `git add -A && git commit -m "..." && git push origin main`
+2. Masaüstü SHRIMP klasörü kaynak; GitHub versiyon; Vercel otomatik deploy ile shrimpbridge.com güncellenir
 
-Bu iki yer her zaman senkron tutulmalı:
+Senkron tutulacak yerler:
 - GitHub: https://github.com/buraksalli007/Shrimp
 - Local: /Users/buraksalli/Desktop/SHRIMP/openclaw-cursor-orchestrator
+- Web: https://www.shrimpbridge.com (Vercel deploy)
