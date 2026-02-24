@@ -114,39 +114,38 @@ Native OpenClaw tool so users can:
 
 ## 5. Implementation Phases
 
-### Phase 1: Persistence & Auth (Current)
-- [ ] Prisma + SQLite/Postgres
-- [ ] Users, API keys, projects in DB
-- [ ] API key middleware
-- [ ] Migrate task-manager to DB
+### Phase 1: Persistence & Auth ✅
+- [x] Prisma + PostgreSQL (Vercel Postgres)
+- [x] Users, API keys, projects schema
+- [x] API key middleware (API_KEYS env)
+- [ ] Migrate task-manager to DB (in-memory hâlâ)
 
-### Phase 2: Monetization
-- [ ] Stripe products/prices
-- [ ] Checkout session endpoint
-- [ ] Webhook handler
-- [ ] Usage tracking
-- [ ] Quota enforcement
+### Phase 2: Monetization ✅
+- [x] Stripe checkout endpoint
+- [x] Webhook handler (checkout.session.completed, etc.)
+- [ ] Usage tracking (planlanıyor)
+- [ ] Quota enforcement (planlanıyor)
 
-### Phase 3: OpenClaw Callback Flow
-- [ ] Pending project state
-- [ ] Plan callback: parse JSON tasks from OpenClaw
-- [ ] Launch Cursor after plan received
+### Phase 3: OpenClaw Callback Flow ✅
+- [x] Pending project state (pending_plan)
+- [x] Plan callback: parse JSON tasks from OpenClaw
+- [x] Launch Cursor after plan received
 
-### Phase 4: OpenClaw Error-Fix
-- [ ] On verification fail: request fix from OpenClaw
-- [ ] Parse response, use as Cursor prompt
-- [ ] Fallback to OpenAI/static if OpenClaw unavailable
+### Phase 4: OpenClaw Error-Fix ✅
+- [x] On verification fail: request fix from OpenClaw
+- [x] Parse response, use as Cursor prompt
+- [x] Fallback to OpenAI if OpenClaw unavailable
 
-### Phase 5: OpenClaw Tool
-- [ ] Tool definition for OpenClaw
-- [ ] Action handlers: start_project, approve_project, get_status
-- [ ] Auth via API key in tool config
+### Phase 5: OpenClaw Tool ✅
+- [x] Tool definition (docs/OPENCLAW_TOOL.md)
+- [x] start_project, approve_project, get_project_status
+- [x] Auth via API key
 
-### Phase 6: Production Polish
-- [ ] Rate limiting
-- [ ] Structured logging
-- [ ] Admin dashboard
-- [ ] Docs site
+### Phase 6: Production Polish ✅
+- [x] Rate limiting (express-rate-limit)
+- [x] Security headers (Helmet)
+- [x] Structured logging
+- [x] Docs (ARCHITECTURE, SETUP, VERCEL_ENV, OPENCLAW_NGROK)
 
 ---
 
