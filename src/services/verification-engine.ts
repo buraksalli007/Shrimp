@@ -157,14 +157,16 @@ export async function verifyProject(
 export async function cloneOrPullRepo(
   githubRepo: string,
   branch: string,
-  targetDir: string
+  targetDir: string,
+  githubTokenOverride?: string
 ): Promise<string> {
   const env = getEnv();
+  const token = githubTokenOverride ?? env.GITHUB_TOKEN;
   let cloneUrl = githubRepo.startsWith("http")
     ? githubRepo
     : `https://github.com/${githubRepo}.git`;
-  if (env.GITHUB_TOKEN) {
-    cloneUrl = cloneUrl.replace("https://", `https://${env.GITHUB_TOKEN}@`);
+  if (token) {
+    cloneUrl = cloneUrl.replace("https://", `https://${token}@`);
   }
 
   try {

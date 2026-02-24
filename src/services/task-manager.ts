@@ -3,6 +3,7 @@ import type {
   TaskState,
   TaskStatus,
   VerificationResult,
+  UserCredentialsOverride,
 } from "../types/index.js";
 import { DEFAULT_MAX_ITERATIONS } from "../config/constants.js";
 
@@ -19,6 +20,8 @@ export function createProject(params: {
   tasks: Task[];
   maxIterations?: number;
   status?: TaskStatus;
+  userCredentials?: UserCredentialsOverride;
+  platform?: string;
 }): TaskState {
   const projectId = generateProjectId();
   const now = new Date();
@@ -32,6 +35,8 @@ export function createProject(params: {
     iteration: 0,
     maxIterations: params.maxIterations ?? DEFAULT_MAX_ITERATIONS,
     status: params.status ?? "running",
+    userCredentials: params.userCredentials,
+    platform: params.platform ?? "cursor",
     createdAt: now,
     updatedAt: now,
   };

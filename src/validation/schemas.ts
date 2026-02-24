@@ -4,6 +4,7 @@ export const startRequestSchema = z.object({
   idea: z.string().min(1, "idea is required").max(2000),
   githubRepo: z.string().min(1, "githubRepo is required").max(500),
   branch: z.string().max(100).optional().default("main"),
+  platform: z.enum(["cursor", "vibecode"]).optional().default("cursor"),
   tasks: z
     .array(
       z.object({
@@ -13,6 +14,15 @@ export const startRequestSchema = z.object({
         prompt: z.string().min(1).optional(),
       })
     )
+    .optional(),
+  credentials: z
+    .object({
+      cursorApiKey: z.string().optional(),
+      cursorWebhookSecret: z.string().optional(),
+      openclawToken: z.string().optional(),
+      openclawGatewayUrl: z.string().optional(),
+      githubToken: z.string().optional(),
+    })
     .optional(),
 });
 

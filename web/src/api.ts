@@ -80,9 +80,19 @@ export interface ProjectDetail {
   updatedAt: string;
 }
 
+export interface UserCredentials {
+  cursorApiKey?: string;
+  cursorWebhookSecret?: string;
+  openclawToken?: string;
+  openclawGatewayUrl?: string;
+  githubToken?: string;
+}
+
 export interface StartRequest {
   idea: string;
   githubRepo: string;
   branch?: string;
+  platform?: "cursor" | "vibecode";
   tasks?: Array<{ id?: string; title?: string; description?: string; prompt: string }>;
+  credentials?: UserCredentials;
 }

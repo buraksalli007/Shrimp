@@ -14,6 +14,14 @@ export interface VerificationResult {
 
 export type TaskStatus = "pending_plan" | "running" | "awaiting_approval" | "completed" | "failed" | "pending_fix";
 
+export interface UserCredentialsOverride {
+  cursorApiKey?: string;
+  cursorWebhookSecret?: string;
+  openclawToken?: string;
+  openclawGatewayUrl?: string;
+  githubToken?: string;
+}
+
 export interface TaskState {
   projectId: string;
   idea: string;
@@ -25,6 +33,8 @@ export interface TaskState {
   maxIterations: number;
   status: TaskStatus;
   currentAgentId?: string;
+  userCredentials?: UserCredentialsOverride;
+  platform?: string;
   createdAt: Date;
   updatedAt: Date;
 }

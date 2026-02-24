@@ -87,28 +87,38 @@ export function Landing() {
 
       <section id="pricing" className="section pricing">
         <h2 className="section-title">Simple, transparent pricing</h2>
+        <p className="section-intro">Use your own Cursor and OpenClaw. We orchestrate them together.</p>
         <div className="pricing-grid">
           <div className="pricing-card">
-            <h3>Starter</h3>
-            <div className="price">$29<span>/mo</span></div>
+            <h3>Free</h3>
+            <div className="price">$0</div>
             <ul>
-              <li>1 API key</li>
-              <li>50 project runs</li>
-              <li>Standard support</li>
+              <li>2 projects/month</li>
+              <li>Cursor + GitHub</li>
+              <li>Basic orchestration</li>
             </ul>
             <Link to="/dashboard" className="btn btn-outline">Get started</Link>
           </div>
           <div className="pricing-card featured">
             <div className="badge">Popular</div>
-            <h3>Pro</h3>
-            <div className="price">$99<span>/mo</span></div>
+            <h3>Starter</h3>
+            <div className="price">$19<span>/mo</span></div>
             <ul>
-              <li>5 API keys</li>
-              <li>Unlimited runs</li>
-              <li>Priority support</li>
-              <li>OpenClaw tool access</li>
+              <li>25 projects/month</li>
+              <li>+ OpenClaw integration</li>
+              <li>+ GitHub private repos</li>
             </ul>
-            <a href="https://www.shrimpbridge.com/dashboard" className="btn btn-primary">Get Pro</a>
+            <a href="https://www.shrimpbridge.com/dashboard" className="btn btn-primary">Get Starter</a>
+          </div>
+          <div className="pricing-card">
+            <h3>Pro</h3>
+            <div className="price">$49<span>/mo</span></div>
+            <ul>
+              <li>Unlimited projects</li>
+              <li>Vibecode template</li>
+              <li>API + priority support</li>
+            </ul>
+            <a href="https://www.shrimpbridge.com/dashboard" className="btn btn-outline">Get Pro</a>
           </div>
           <div className="pricing-card">
             <h3>Enterprise</h3>
@@ -134,7 +144,7 @@ export function Landing() {
             </div>
             <div className="docs-endpoint">
               <code>POST /start</code>
-              <p>Start a new project. Body: idea, githubRepo, branch?, tasks?</p>
+              <p>Start a project. Body: idea, githubRepo, branch?, platform?, credentials? (cursorApiKey, openclawToken, etc.)</p>
             </div>
             <div className="docs-endpoint">
               <code>GET /projects</code>

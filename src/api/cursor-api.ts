@@ -9,6 +9,8 @@ export interface LaunchAgentParams {
   branch?: string;
   webhookUrl?: string;
   webhookSecret?: string;
+  cursorApiKey?: string;
+  cursorWebhookSecret?: string;
 }
 
 export interface LaunchAgentResponse {
@@ -23,18 +25,19 @@ export interface GetAgentResponse {
   [key: string]: unknown;
 }
 
-function getAuthHeader(): string {
-  const env = getEnv();
-  if (!env.CURSOR_API_KEY) {
-    throw new Error("CURSOR_API_KEY is required for Cursor API");
+function getAuthHeader(cursorApiKey?: string): string {
+  const key = cursorApiKey ?? getEnv().CURSOR_API_KEY;
+  if (!key) {
+    throw new Error("Cursor API key required. Provide credentials.cursorApiKey or set CURSOR_API_KEY in env.");
   }
-  const encoded = Buffer.from(`${env.CURSOR_API_KEY}:`).toString("base64");
+  const encoded = Buffer.from(`${key}:`).toString("base64");
   return `Basic ${encoded}`;
 }
 
 export async function launchAgent(params: LaunchAgentParams): Promise<LaunchAgentResponse> {
   const env = getEnv();
   const webhookUrl = params.webhookUrl ?? `${env.ORCHESTRATION_URL}/webhooks/cursor`;
+  const webhookSecret = params.cursorWebhookSecret ?? env.CURSOR_WEBHOOK_SECRET;
 
   const body: Record<string, unknown> = {
     prompt: { text: params.prompt },
@@ -46,7 +49,7 @@ export async function launchAgent(params: LaunchAgentParams): Promise<LaunchAgen
     },
     webhook: {
       url: webhookUrl,
-      ...(params.webhookSecret && { secret: params.webhookSecret }),
+      ...(webhookSecret && { secret: webhookSecret }),
     },
   };
 
@@ -54,7 +57,7 @@ export async function launchAgent(params: LaunchAgentParams): Promise<LaunchAgen
     const res = await fetch(`${CURSOR_API_BASE}/agents`, {
       method: "POST",
       headers: {
-        Authorization: getAuthHeader(),
+        Authorization: getAuthHeader(params.cursorApiKey),
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),

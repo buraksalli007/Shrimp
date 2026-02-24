@@ -91,11 +91,21 @@ app.post("/start", requireApiKey, async (req, res) => {
       res.status(400).json({ error: msg });
       return;
     }
-    const { idea, githubRepo, branch = "main", tasks: providedTasks } = parseResult.data;
+    const { idea, githubRepo, branch = "main", platform = "cursor", tasks: providedTasks, credentials } = parseResult.data;
+
+    const creds = credentials && (credentials.cursorApiKey || credentials.openclawToken)
+      ? {
+          cursorApiKey: credentials.cursorApiKey,
+          cursorWebhookSecret: credentials.cursorWebhookSecret,
+          openclawToken: credentials.openclawToken,
+          openclawGatewayUrl: credentials.openclawGatewayUrl,
+          githubToken: credentials.githubToken,
+        }
+      : undefined;
 
     const filtered = providedTasks?.filter((t) => t.prompt || t.title) ?? [];
     let tasks: Task[];
-    let useOpenClawPlan = false;
+    const useOpenClawPlan = !!(creds?.openclawToken || getEnv().OPENCLAW_HOOKS_TOKEN);
 
     if (filtered.length > 0) {
       tasks = filtered.map((t) => ({
@@ -113,7 +123,6 @@ app.post("/start", requireApiKey, async (req, res) => {
           prompt: `Create a complete Expo/React Native app for: ${idea}. Use the Vibecode template structure. Follow Apple HIG for design.`,
         },
       ];
-      useOpenClawPlan = !!getEnv().OPENCLAW_HOOKS_TOKEN;
     }
 
     const state = createProject({
@@ -122,10 +131,12 @@ app.post("/start", requireApiKey, async (req, res) => {
       branch,
       tasks,
       status: useOpenClawPlan ? "pending_plan" : "running",
+      userCredentials: creds,
+      platform,
     });
 
     if (useOpenClawPlan) {
-      await requestPlanFromOpenClaw(idea, state.projectId);
+      await requestPlanFromOpenClaw(idea, state.projectId, creds);
       logger.info("Project created, awaiting OpenClaw plan", {
         projectId: state.projectId,
       });
@@ -148,7 +159,8 @@ app.post("/start", requireApiKey, async (req, res) => {
       prompt: firstTask.prompt,
       repo: githubRepo,
       branch,
-      webhookSecret: env.CURSOR_WEBHOOK_SECRET,
+      cursorApiKey: creds?.cursorApiKey,
+      cursorWebhookSecret: creds?.cursorWebhookSecret ?? env.CURSOR_WEBHOOK_SECRET,
     });
     setCurrentAgentId(state.projectId, agent.id);
 

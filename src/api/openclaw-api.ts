@@ -13,13 +13,23 @@ export interface OpenClawAgentPayload {
   timeoutSeconds?: number;
 }
 
-export async function sendToOpenClaw(payload: OpenClawAgentPayload): Promise<void> {
+export interface OpenClawCredentialsOverride {
+  openclawToken?: string;
+  openclawGatewayUrl?: string;
+}
+
+export async function sendToOpenClaw(
+  payload: OpenClawAgentPayload,
+  credentialsOverride?: OpenClawCredentialsOverride
+): Promise<void> {
   const env = getEnv();
-  if (!env.OPENCLAW_HOOKS_TOKEN) {
-    logger.info("OpenClaw: skipping (no OPENCLAW_HOOKS_TOKEN)");
+  const token = credentialsOverride?.openclawToken ?? env.OPENCLAW_HOOKS_TOKEN;
+  if (!token) {
+    logger.info("OpenClaw: skipping (no token)");
     return;
   }
-  const url = `${env.OPENCLAW_GATEWAY_URL.replace(/^ws/, "http")}/hooks/agent`;
+  const gatewayUrl = credentialsOverride?.openclawGatewayUrl ?? env.OPENCLAW_GATEWAY_URL;
+  const url = `${gatewayUrl.replace(/^ws/, "http")}/hooks/agent`;
 
   const body: OpenClawAgentPayload = {
     ...payload,
@@ -34,7 +44,7 @@ export async function sendToOpenClaw(payload: OpenClawAgentPayload): Promise<voi
     const res = await fetch(url, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${env.OPENCLAW_HOOKS_TOKEN}`,
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),

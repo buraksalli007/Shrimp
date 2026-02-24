@@ -81,20 +81,27 @@ function parseFixPromptFromMessage(message: string): string | null {
 async function handlePlanCallback(projectId: string, tasks: Task[]): Promise<void> {
   const updated = updateProjectWithTasks(projectId, tasks);
   if (!updated) return;
+  const state = getProject(projectId);
+  if (!state) return;
   const firstTask = getNextTask(projectId);
   if (!firstTask) return;
   const env = getEnv();
+  const creds = state.userCredentials;
   const agent = await launchAgent({
     prompt: firstTask.prompt,
-    repo: getProject(projectId)!.githubRepo,
-    branch: getProject(projectId)!.branch,
-    webhookSecret: env.CURSOR_WEBHOOK_SECRET,
+    repo: state.githubRepo,
+    branch: state.branch,
+    cursorApiKey: creds?.cursorApiKey,
+    cursorWebhookSecret: creds?.cursorWebhookSecret ?? env.CURSOR_WEBHOOK_SECRET,
   });
   setCurrentAgentId(projectId, agent.id);
-  await sendToOpenClaw({
-    message: `Plan received. Cursor agent launched for ${projectId}.`,
-    name: "Orchestrator",
-  });
+  await sendToOpenClaw(
+    {
+      message: `Plan received. Cursor agent launched for ${projectId}.`,
+      name: "Orchestrator",
+    },
+    creds
+  );
   logger.info("Plan callback: launch agent", { projectId, agentId: agent.id });
 }
 
@@ -103,17 +110,22 @@ async function handleFixCallback(projectId: string, fixPrompt: string): Promise<
   if (!state || state.status !== "pending_fix") return;
   setProjectRunning(projectId);
   const env = getEnv();
+  const creds = state.userCredentials;
   const agent = await launchAgent({
     prompt: fixPrompt,
     repo: state.githubRepo,
     branch: state.branch,
-    webhookSecret: env.CURSOR_WEBHOOK_SECRET,
+    cursorApiKey: creds?.cursorApiKey,
+    cursorWebhookSecret: creds?.cursorWebhookSecret ?? env.CURSOR_WEBHOOK_SECRET,
   });
   setCurrentAgentId(projectId, agent.id);
-  await sendToOpenClaw({
-    message: `Fix prompt received. Cursor agent launched for ${projectId}.`,
-    name: "Orchestrator",
-  });
+  await sendToOpenClaw(
+    {
+      message: `Fix prompt received. Cursor agent launched for ${projectId}.`,
+      name: "Orchestrator",
+    },
+    creds
+  );
   logger.info("Fix callback: launch agent", { projectId, agentId: agent.id });
 }
 
