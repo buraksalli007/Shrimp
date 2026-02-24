@@ -1,0 +1,14 @@
+{
+  "name": "minimal-expo-sim",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "expo start",
+    "lint": "echo ok",
+    "test": "echo ok"
+  },
+  "dependencies": {
+    "expo": "~52.0.0",
+    "react": "18.2.0",
+    "react-native": "0.76.0"
+  }
+}

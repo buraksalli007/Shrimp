@@ -10,5 +10,6 @@ web/dist/
 .env.*.local
 prisma/dev.db
 prisma/dev.db-journal
+prisma/test.db
 
 src/generated/

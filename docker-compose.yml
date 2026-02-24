@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: shrimp
+      POSTGRES_PASSWORD: shrimp
+      POSTGRES_DB: shrimp
+    ports:
+      - "5432:5432"
+    volumes:
+      - shrimp_pg_data:/var/lib/postgresql/data
+
+volumes:
+  shrimp_pg_data:

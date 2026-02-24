@@ -22,6 +22,8 @@ export interface UserCredentialsOverride {
   githubToken?: string;
 }
 
+export type AutonomyMode = "assist" | "builder" | "autopilot";
+
 export interface TaskState {
   projectId: string;
   idea: string;
@@ -35,6 +37,8 @@ export interface TaskState {
   currentAgentId?: string;
   userCredentials?: UserCredentialsOverride;
   platform?: string;
+  autonomyMode?: AutonomyMode;
+  outcomeJson?: string;
   createdAt: Date;
   updatedAt: Date;
 }

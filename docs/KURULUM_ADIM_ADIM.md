@@ -77,7 +77,7 @@ OpenClaw'ın kurulu ve çalışır durumda olduğundan emin ol. Gateway port: **
 1. OpenClaw config: `~/.openclaw/openclaw.json`
 2. Hooks bölümünde `token` değeri → bu senin `OPENCLAW_HOOKS_TOKEN` değerin
 3. Yoksa rastgele güçlü bir token oluştur (örn. `openssl rand -hex 32`)
-4. Config'e ekle:
+4. Config'e ekle (token en az 16 karakter olmalı):
 
 ```json
 {

@@ -4,10 +4,48 @@ import type {
   TaskStatus,
   VerificationResult,
   UserCredentialsOverride,
+  AutonomyMode,
 } from "../types/index.js";
 import { DEFAULT_MAX_ITERATIONS } from "../config/constants.js";
 
 const projectStates = new Map<string, TaskState>();
+const projectMeta = new Map<string, { userId?: string; apiKeyId?: string }>();
+
+export function resetForTesting(): void {
+  if (process.env.NODE_ENV !== "test") return;
+  projectStates.clear();
+  projectMeta.clear();
+}
+
+export function hydrateProjectStates(params: {
+  projectId: string;
+  idea: string;
+  githubRepo: string;
+  branch: string;
+  tasks: Task[];
+  currentIndex: number;
+  iteration: number;
+  maxIterations: number;
+  status: TaskStatus;
+  currentAgentId?: string;
+  platform?: string;
+  autonomyMode?: AutonomyMode;
+  outcomeJson?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  userId?: string;
+  apiKeyId?: string;
+}): void {
+  const { userId, apiKeyId, ...rest } = params;
+  const state: TaskState = {
+    ...rest,
+    userCredentials: undefined,
+  };
+  projectStates.set(params.projectId, state);
+  if (userId || apiKeyId) {
+    projectMeta.set(params.projectId, { userId, apiKeyId });
+  }
+}
 
 function generateProjectId(): string {
   return `proj_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
@@ -22,6 +60,10 @@ export function createProject(params: {
   status?: TaskStatus;
   userCredentials?: UserCredentialsOverride;
   platform?: string;
+  autonomyMode?: AutonomyMode;
+  outcomeJson?: string;
+  userId?: string;
+  apiKeyId?: string;
 }): TaskState {
   const projectId = generateProjectId();
   const now = new Date();
@@ -37,24 +79,40 @@ export function createProject(params: {
     status: params.status ?? "running",
     userCredentials: params.userCredentials,
     platform: params.platform ?? "cursor",
+    autonomyMode: params.autonomyMode ?? "builder",
+    outcomeJson: params.outcomeJson,
     createdAt: now,
     updatedAt: now,
   };
   projectStates.set(projectId, state);
+  if (params.userId || params.apiKeyId) {
+    projectMeta.set(projectId, { userId: params.userId, apiKeyId: params.apiKeyId });
+  }
   return state;
+}
+
+export function getProjectMeta(projectId: string): { userId?: string; apiKeyId?: string } | undefined {
+  return projectMeta.get(projectId);
 }
 
 export function getProject(projectId: string): TaskState | undefined {
   return projectStates.get(projectId);
 }
 
-export function getAllProjects(): Array<Pick<TaskState, "projectId" | "idea" | "status" | "createdAt">> {
-  return Array.from(projectStates.values()).map((s) => ({
+export function getAllProjects(filter?: { userId?: string; apiKeyId?: string }): Array<Pick<TaskState, "projectId" | "idea" | "status" | "createdAt">> {
+  const all = Array.from(projectStates.values()).map((s) => ({
     projectId: s.projectId,
     idea: s.idea,
     status: s.status,
     createdAt: s.createdAt,
   }));
+  if (!filter?.userId && !filter?.apiKeyId) return all;
+  return all.filter((p) => {
+    const meta = projectMeta.get(p.projectId);
+    if (filter.userId && meta?.userId === filter.userId) return true;
+    if (filter.apiKeyId && meta?.apiKeyId === filter.apiKeyId) return true;
+    return false;
+  });
 }
 
 export function getProjectByAgentId(agentId: string): TaskState | undefined {

@@ -36,6 +36,11 @@ function getAuthHeader(cursorApiKey?: string): string {
 
 export async function launchAgent(params: LaunchAgentParams): Promise<LaunchAgentResponse> {
   const env = getEnv();
+  if (env.ORCHESTRATION_SIMULATION) {
+    const id = `sim_agent_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    logger.info("Simulation: mock agent launched", { agentId: id });
+    return { id };
+  }
   const webhookUrl = params.webhookUrl ?? `${env.ORCHESTRATION_URL}/webhooks/cursor`;
   const webhookSecret = params.cursorWebhookSecret ?? env.CURSOR_WEBHOOK_SECRET;
 

@@ -5,6 +5,7 @@ export const startRequestSchema = z.object({
   githubRepo: z.string().min(1, "githubRepo is required").max(500),
   branch: z.string().max(100).optional().default("main"),
   platform: z.enum(["cursor", "vibecode"]).optional().default("cursor"),
+  autonomyMode: z.enum(["assist", "builder", "autopilot"]).optional().default("builder"),
   tasks: z
     .array(
       z.object({

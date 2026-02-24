@@ -1,5 +1,12 @@
 # OpenClaw Konfigürasyonu
 
+## Güvenlik
+
+- **OPENCLAW_HOOKS_TOKEN** zorunludur (min 16 karakter). Tanımlı değilse webhook 503 döner.
+- Token `Authorization: Bearer <token>` veya `X-OpenClaw-Token: <token>` header ile gönderilir.
+- Timing-safe karşılaştırma kullanılır; token tahmin saldırılarına karşı korunur.
+- Gateway URL sadece `http`/`https` kabul edilir; internal IP (192.168.x, 10.x) bloklanır (SSRF koruması).
+
 ## Hooks Ayarı
 
 `~/.openclaw/openclaw.json` dosyasına ekleyin:

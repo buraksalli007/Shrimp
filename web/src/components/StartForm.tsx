@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api, type UserCredentials } from "../api";
+import { api, type UserCredentials, type AutonomyMode, type OutcomeResult } from "../api";
 
 interface FormProps {
   onSuccess: () => void;
@@ -10,27 +10,39 @@ export function StartForm({ onSuccess }: FormProps) {
   const [githubRepo, setGithubRepo] = useState("");
   const [branch, setBranch] = useState("main");
   const [platform, setPlatform] = useState<"cursor" | "vibecode">("cursor");
+  const [autonomyMode, setAutonomyMode] = useState<AutonomyMode>("builder");
   const [showCredentials, setShowCredentials] = useState(false);
   const [credentials, setCredentials] = useState<UserCredentials>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [assistResult, setAssistResult] = useState<{ outcome?: OutcomeResult; decision?: unknown; message: string } | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setAssistResult(null);
     setLoading(true);
     try {
       const creds = (credentials.cursorApiKey || credentials.openclawToken) ? credentials : undefined;
-      await api.start({
+      const res = await api.start({
         idea,
         githubRepo,
         branch,
         platform,
+        autonomyMode,
         credentials: creds,
       });
-      setIdea("");
-      setGithubRepo("");
-      onSuccess();
+      if ("mode" in res && res.mode === "assist") {
+        setAssistResult({
+          outcome: res.outcome,
+          decision: res.decision,
+          message: res.message,
+        });
+      } else {
+        setIdea("");
+        setGithubRepo("");
+        onSuccess();
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Request failed");
     } finally {
@@ -40,8 +52,9 @@ export function StartForm({ onSuccess }: FormProps) {
 
   return (
     <form className="form" onSubmit={handleSubmit}>
-      <div className="form-group">
-        <label htmlFor="platform">Platform</label>
+      <div className="form-row form-row-equal">
+        <div className="form-group">
+          <label htmlFor="platform">Platform</label>
         <select
           id="platform"
           value={platform}
@@ -50,6 +63,19 @@ export function StartForm({ onSuccess }: FormProps) {
           <option value="cursor">Cursor (Expo/React Native)</option>
           <option value="vibecode">Vibecode</option>
         </select>
+        </div>
+        <div className="form-group">
+          <label htmlFor="autonomyMode">Autonomy</label>
+          <select
+            id="autonomyMode"
+            value={autonomyMode}
+            onChange={(e) => setAutonomyMode(e.target.value as AutonomyMode)}
+          >
+            <option value="assist">Assist – suggestions only</option>
+            <option value="builder">Builder – execute with approval</option>
+            <option value="autopilot">Autopilot – full automation</option>
+          </select>
+        </div>
       </div>
       <div className="form-group">
         <label htmlFor="idea">App idea</label>
@@ -129,6 +155,31 @@ export function StartForm({ onSuccess }: FormProps) {
         )}
       </div>
       {error && <p className="form-error">{error}</p>}
+      {assistResult && (
+        <div className="assist-result">
+          <p className="assist-message">{assistResult.message}</p>
+          {assistResult.outcome && (
+            <details className="assist-outcome">
+              <summary>MVP features & plan</summary>
+              <ul>
+                {assistResult.outcome.mvpFeatures.map((f, i) => (
+                  <li key={i}>{f}</li>
+                ))}
+              </ul>
+              {assistResult.outcome.riskAnalysis.length > 0 && (
+                <>
+                  <strong>Risks:</strong>
+                  <ul>
+                    {assistResult.outcome.riskAnalysis.map((r, i) => (
+                      <li key={i}>{r.risk} ({r.severity}) – {r.mitigation}</li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </details>
+          )}
+        </div>
+      )}
       <button type="submit" className="btn btn-primary" disabled={loading}>
         {loading ? "Starting..." : "Start project"}
       </button>

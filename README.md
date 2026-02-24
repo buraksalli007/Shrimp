@@ -20,6 +20,13 @@ Fikir → OpenClaw (araştırma, plan) → Cursor (kod) → Webhook → Doğrula
 2. `npm install`
 3. `npm run build`
 4. `npm start`
+5. `npm test` - Unit testler (39 test)
+6. `npm run e2e` - E2E kullanıcı simülasyonu (sunucu çalışırken)
+7. `npm run e2e:sim` - Kapsamlı simülasyonlar (15 senaryo: auth edge, izolasyon, revoke, vb.)
+8. `npm run e2e:orch` - Tam orchestration simülasyonu (plan → Cursor → verify → task/approval)
+9. `npm run e2e:fix` - Fix flow simülasyonu (verify fail → OpenClaw fix → Cursor retry → pass)
+
+**Simülasyon modu:** Sunucuyu `ORCHESTRATION_SIMULATION=true` ile başlatınca Cursor/OpenClaw API çağrıları mock edilir. Fix flow testi için `SIMULATION_VERIFY_FAIL_COUNT=2` ekleyin (ilk 2 verify fail simüle edilir).
 
 Local webhook için: `ngrok http 3000` çalıştır, `ORCHESTRATION_URL` olarak ngrok URL'ini kullan.
 

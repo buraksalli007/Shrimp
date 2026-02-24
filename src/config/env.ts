@@ -23,6 +23,8 @@ const envSchema = z.object({
   MAX_ITERATIONS: z.coerce.number().default(10),
   VERIFICATION_TIMEOUT_MS: z.coerce.number().default(120_000),
   PORT: z.coerce.number().default(3000),
+  ORCHESTRATION_SIMULATION: z.coerce.boolean().default(false),
+  SIMULATION_VERIFY_FAIL_COUNT: z.coerce.number().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

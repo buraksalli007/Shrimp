@@ -12,9 +12,15 @@
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
     "dev:web": "cd web && npm run dev",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "NODE_ENV=test node --import tsx --test test/**/*.test.ts",
+    "e2e": "npx tsx scripts/e2e-user-simulation.ts",
+    "e2e:sim": "npx tsx scripts/e2e-simulations.ts",
+    "e2e:orch": "npx tsx scripts/e2e-orchestration-sim.ts",
+    "e2e:fix": "npx tsx scripts/e2e-fix-flow-sim.ts"
   },
   "dependencies": {
+    "@prisma/adapter-better-sqlite3": "^7.4.1",
     "@prisma/client": "^7.4.1",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.6.2",

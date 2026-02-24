@@ -4,6 +4,10 @@
 
 `http://localhost:3000` (veya `ORCHESTRATION_URL`)
 
+## Authentication
+
+Tüm korumalı endpoint'ler `Authorization: Bearer YOUR_API_KEY` header gerektirir. API key kayıt veya login ile alınır.
+
 ## Endpoints
 
 ### GET /health

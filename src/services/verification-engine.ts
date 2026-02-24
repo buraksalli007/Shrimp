@@ -61,11 +61,29 @@ function extractErrors(stdout: string, stderr: string): string[] {
   return [...new Set(errors)].slice(0, 20);
 }
 
+export interface VerifyProjectOptions {
+  useBun?: boolean;
+  simulationFailIteration?: number;
+  simulationFailCount?: number;
+}
+
 export async function verifyProject(
   repoPath: string,
-  options?: { useBun?: boolean }
+  options?: VerifyProjectOptions
 ): Promise<VerificationResult> {
   const env = getEnv();
+  if (env.ORCHESTRATION_SIMULATION) {
+    const opts = options ?? {};
+    const failCount = opts.simulationFailCount ?? env.SIMULATION_VERIFY_FAIL_COUNT ?? 0;
+    if (failCount > 0 && typeof opts.simulationFailIteration === "number" && opts.simulationFailIteration < failCount) {
+      return {
+        success: false,
+        errors: ["Simulated lint error: unused variable", "Simulated test failure"],
+        stderr: "npm err! simulated failure",
+      };
+    }
+    return { success: true, errors: [] };
+  }
   const timeoutMs = env.VERIFICATION_TIMEOUT_MS;
   const useBun = options?.useBun ?? true;
   const packageManager = useBun ? "bun" : "npm";
@@ -161,6 +179,12 @@ export async function cloneOrPullRepo(
   githubTokenOverride?: string
 ): Promise<string> {
   const env = getEnv();
+  if (env.ORCHESTRATION_SIMULATION && (githubRepo === "sim/test" || githubRepo.startsWith("sim/"))) {
+    const fixturePath = path.join(process.cwd(), "test", "fixtures", "minimal-expo");
+    await fs.mkdir(path.dirname(targetDir), { recursive: true });
+    await fs.cp(fixturePath, targetDir, { recursive: true });
+    return targetDir;
+  }
   const token = githubTokenOverride ?? env.GITHUB_TOKEN;
   let cloneUrl = githubRepo.startsWith("http")
     ? githubRepo
